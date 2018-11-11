@@ -1,0 +1,56 @@
+version: '2.1'
+services:
+  tick-influxdb:
+    command: ${INFLUXDB_COMMAND:--config /etc/influxdb/influxdb.conf}
+    container_name: ${CONTAINER_HOST_NAME:-standalone.tick}-influxdb
+    environment:
+    # The administrator interface is deprecated as of 1.1.0 and will be removed in 1.3.0.
+    #- INFLUXDB_ADMIN_ENABLED=${INFLUXDB_ADMIN_ENABLED:-false}
+    - INFLUXDB_DATA_QUERY_LOG_ENABLED=${INFLUXDB_DATA_QUERY_LOG_ENABLED:-true}
+    - INFLUXDB_GRAPHITE_ENABLED=${INFLUXDB_GRAPHITE_ENABLED:-true}
+    #- INFLUXDB_META_DIR=${INFLUXDB_META_DIR:-/var/lib/influxdb/meta}
+    - INFLUXDB_REPORTING_DISABLED=${INFLUXDB_REPORTING_DISABLED:-false}
+    hostname: ${CONTAINER_HOST_NAME:-standalone.tick}-influxdb
+    image: ${IMAGE_NAME:-influxdb}:${IMAGE_TAG:-1.7.0}
+    labels:
+      deploy.config.commit: ${LABEL_DEPLOY_CONFIG_COMMIT:-unknown}
+      deploy.config.name: ${LABEL_DEPLOY_CONFIG_NAME:-unknown}
+      deploy.config.ref: ${LABEL_DEPLOY_CONFIG_REF:-unknown}
+      deploy.util.commit: ${LABEL_DEPLOY_UTIL_COMMIT:-unknown}
+      deploy.util.ref: ${LABEL_DEPLOY_UTIL_REF:-unknown}
+      instance.name.short: ${LABEL_INSTANCE_NAME_SHORT:-standalone.tick-influxdb}
+      instance.name: ${LABEL_INSTANCE_NAME:-127.0.0.1/tick-influxdb/standalone}
+    networks:
+      local-network:
+        ipv4_address: 172.16.238.81
+        #ipv6_address: 2001:3984:3989::81
+    ports:
+    - "${EXTERNAL_INFLUXDB_HTTP_API_PORT:-8086}:${INFLUXDB_HTTP_API_PORT:-8086}"
+    #- "${EXTERNAL_INFLUXDB_ADMIN_PORT:-8083}:${INFLUXDB_ADMIN_PORT:-8083}"
+    - "${EXTERNAL_INFLUXDB_GRAPHITE_PORT:-2003}:${INFLUXDB_GRAPHITE_PORT:-2003}"
+    #- "${EXTERNAL_INFLUXDB_UDP_PORT:-8089}:${INFLUXDB_UDP_PORT:-8089}"
+    restart: always
+    volumes:
+    - ${INFLUXDB_CONFIG:-./data/etc/influxdb/influxdb.conf}:/etc/influxdb/influxdb.conf:ro # mount or copy into container
+    - influxdb_data:/var/lib/influxdb
+
+
+networks:
+  local-network:
+    external: true
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.238.0/24
+      #- subnet: 2001:3984:3989::/64
+
+
+volumes:
+  influxdb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${PWD}/data/var/lib/influxdb
+      o: bind
