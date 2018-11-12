@@ -22,13 +22,13 @@ services:
       instance.name: ${LABEL_INSTANCE_NAME:-127.0.0.1/tick-influxdb/standalone}
     networks:
       local-network:
-        ipv4_address: 172.16.238.81
-        #ipv6_address: 2001:3984:3989::81
+        ipv4_address: ${IPV4_ADDRESS:-172.16.238.81}
+        #ipv6_address: ${IPV6_ADDRESS:-2001:3984:3989::81}
     ports:
-    - "${EXTERNAL_INFLUXDB_HTTP_API_PORT:-8086}:${INFLUXDB_HTTP_API_PORT:-8086}"
-    #- "${EXTERNAL_INFLUXDB_ADMIN_PORT:-8083}:${INFLUXDB_ADMIN_PORT:-8083}"
-    - "${EXTERNAL_INFLUXDB_GRAPHITE_PORT:-2003}:${INFLUXDB_GRAPHITE_PORT:-2003}"
-    #- "${EXTERNAL_INFLUXDB_UDP_PORT:-8089}:${INFLUXDB_UDP_PORT:-8089}"
+    - "${EXTERNAL_INFLUXDB_HTTP_API_8086_PORT:-8086}:8086"
+    #- "${EXTERNAL_INFLUXDB_ADMIN_8083_PORT:-8083}:8083"
+    - "${EXTERNAL_INFLUXDB_GRAPHITE_2003_PORT:-2003}:2003"
+    #- "${EXTERNAL_INFLUXDB_UDP_8089_PORT:-8089}:8089"
     restart: always
     volumes:
     - ${INFLUXDB_CONFIG:-./data/etc/influxdb/influxdb.conf}:/etc/influxdb/influxdb.conf:ro # mount or copy into container
