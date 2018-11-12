@@ -1,0 +1,5 @@
+
+d etc/influxdb               1000:1000 777
+d var/lib/influxdb           1000:1000 777
+
+f etc/influxdb/influxdb.conf 1000:1000 777
